@@ -1,26 +1,244 @@
 @import "tailwindcss";
 
+/* ── Tokens ────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --paper: #f3f0e8;
+  --paper-2: #ebe7dc;
+  --ink: #161513;
+  --ink-2: #4a4740;
+  --ink-3: #6f6b62;
+  --rule: #d6d1c3;
+  --rule-strong: #161513;
+  --accent: #c8401a;
+  --accent-ink: #a8330f;
+  --mark: rgba(200, 64, 26, 0.1);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --paper: #151513;
+    --paper-2: #1d1d1a;
+    --ink: #ece8de;
+    --ink-2: #b6b1a5;
+    --ink-3: #8d897f;
+    --rule: #34332e;
+    --rule-strong: #ece8de;
+    --accent: #f0663a;
+    --accent-ink: #ff8a62;
+    --mark: rgba(240, 102, 58, 0.14);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #151513;
+  --paper-2: #1d1d1a;
+  --ink: #ece8de;
+  --ink-2: #b6b1a5;
+  --ink-3: #8d897f;
+  --rule: #34332e;
+  --rule-strong: #ece8de;
+  --accent: #f0663a;
+  --accent-ink: #ff8a62;
+  --mark: rgba(240, 102, 58, 0.14);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-mark: var(--mark);
+  --font-sans: var(--font-schibsted);
+  --font-mono: var(--font-plex);
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--paper);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Primitives ────────────────────────────────────────── */
+@layer components {
+  .meta {
+    font-family: var(--font-plex), ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .mono {
+    font-family: var(--font-plex), ui-monospace, monospace;
+  }
+  .shell {
+    width: 100%;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+  .display {
+    font-weight: 600;
+    letter-spacing: -0.045em;
+    line-height: 0.9;
+  }
+  .ulink {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--rule);
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+  .ulink:hover {
+    color: var(--accent-ink);
+    text-decoration-color: currentColor;
+  }
+  .tick::before {
+    content: "";
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: var(--accent);
+    margin-right: 0.5rem;
+    vertical-align: 0.1em;
+  }
+}
+
+/* ── Motion: short, purposeful, removable ──────────────── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.enter {
+  animation: rise 0.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Hero: name lines slide up out of a mask, then the rest settles in. */
+@keyframes line-up {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes unveil {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.line-in {
+  display: block;
+  animation: line-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.pop-in {
+  animation: pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) 0.7s both;
+}
+.fade-in {
+  animation: fade 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.portrait {
+  animation: unveil 1s cubic-bezier(0.65, 0, 0.35, 1) 0.25s both;
+}
+
+/* Scroll reveal. Only hides content once JS has confirmed it can reveal it again. */
+.js [data-reveal] .reveal-up {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.js [data-reveal] .reveal-rule {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.js [data-reveal][data-in] .reveal-up {
+  opacity: 1;
+  transform: none;
+}
+.js [data-reveal][data-in] .reveal-rule {
+  transform: none;
+}
+
+/* Reading progress line under the running header */
+.progress {
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
